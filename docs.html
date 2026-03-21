@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Documentation — Aimo Music Bot</title>
+  <meta name="description" content="Aimo Discord Bot documentation — Privacy Policy, Terms of Service, and legal information."/>
+  <link rel="icon" type="image/png" sizes="32x32" href="aimo-logo.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="aimo-logo.png"/>
+  <link rel="manifest" href="site.webmanifest"/>
+  <meta name="theme-color" content="#13111a"/>
+  <style>
+    /* ── RESET & BASE ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:            #13111a;
+      --surface:       #1c1926;
+      --surface2:      #221f2e;
+      --border:        rgba(255,255,255,0.07);
+      --border-strong: rgba(255,255,255,0.14);
+      --text:          #f0eeff;
+      --text-muted:    #8b8aa0;
+      --pink:          #f472b6;
+      --purple:        #a78bfa;
+      --gradient:      linear-gradient(135deg,#f472b6,#a78bfa);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── NAVBAR ──────────────────────────────────────────────── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+      background: rgba(19,17,26,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-weight: 700; font-size: 1.1rem; color: var(--pink);
+    }
+    .nav-brand img { width: 36px; height: 36px; border-radius: 50%; }
+    .nav-links {
+      display: flex; align-items: center; gap: 0.25rem;
+      list-style: none;
+    }
+    .nav-links a {
+      padding: 0.4rem 0.85rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 500; color: var(--text-muted);
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-links a.active {
+      background: rgba(244,114,182,0.12);
+      color: var(--pink);
+    }
+    .nav-btns {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.5rem 1.1rem; border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      border: 1.5px solid transparent; transition: all 0.2s;
+    }
+    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .btn-outline {
+      border-color: var(--border-strong); color: var(--text-muted);
+      background: transparent;
+    }
+    .btn-outline:hover { border-color: var(--pink); color: var(--pink); background: rgba(244,114,182,0.06); }
+    .btn-primary {
+      background: var(--gradient); color: #fff;
+      border-color: transparent;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text-muted); border-radius: 2px; transition: all 0.3s; }
+    .mobile-menu {
+      display: none; flex-direction: column;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 1rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      padding: 0.65rem 1rem; border-radius: 8px;
+      font-size: 0.92rem; font-weight: 500; color: var(--text-muted);
+      transition: color 0.2s, background 0.2s;
+    }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--pink); background: rgba(244,114,182,0.08); }
+    .mobile-menu .mobile-divider { height: 1px; background: var(--border); margin: 0.5rem 0; }
+    .mobile-menu .mobile-btns { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0 0; }
+    .mobile-menu .mobile-btns a {
+      display: flex; align-items: center; gap: 0.5rem;
+      justify-content: center; padding: 0.6rem 1rem;
+      border-radius: 10px; font-weight: 600;
+    }
+    .mobile-menu .mobile-btns .mb-outline { border: 1.5px solid var(--border-strong); color: var(--text-muted); }
+    .mobile-menu .mobile-btns .mb-primary  { background: var(--gradient); color: #fff; }
+
+    @media (max-width: 768px) {
+      .nav-links, .nav-btns { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .docs-hero {
+      padding: 5rem 1.5rem 3.5rem;
+      text-align: center;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(167,139,250,0.10) 0%, transparent 70%);
+    }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--purple);
+      background: rgba(167,139,250,0.1);
+      border: 1px solid rgba(167,139,250,0.25);
+      border-radius: 100px; padding: 0.3rem 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label svg { width: 13px; height: 13px; }
+    .docs-hero-title {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 1rem;
+    }
+    .docs-hero-title span {
+      background: var(--gradient); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .docs-hero-sub {
+      font-size: 1.05rem; color: var(--text-muted);
+      max-width: 540px; margin: 0 auto 2rem;
+    }
+
+    /* ── DOCS GRID ───────────────────────────────────────────── */
+    .docs-section {
+      max-width: 900px; margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .doc-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem 1.75rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .doc-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+    .doc-card.privacy:hover { border-color: rgba(244,114,182,0.4); }
+    .doc-card.terms:hover   { border-color: rgba(167,139,250,0.4); }
+    .doc-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .doc-icon.pink   { background: rgba(244,114,182,0.12); color: var(--pink); }
+    .doc-icon.purple { background: rgba(167,139,250,0.12); color: var(--purple); }
+    .doc-icon svg { width: 26px; height: 26px; }
+    .doc-card-title { font-size: 1.25rem; font-weight: 700; }
+    .doc-card-desc  { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; flex: 1; }
+    .doc-card-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.78rem; color: var(--text-muted);
+      border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.25rem;
+    }
+    .doc-card-link {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-weight: 600; font-size: 0.82rem;
+    }
+    .doc-card.privacy .doc-card-link { color: var(--pink); }
+    .doc-card.terms   .doc-card-link { color: var(--purple); }
+    .doc-card-link svg { width: 14px; height: 14px; transition: transform 0.2s; }
+    .doc-card:hover .doc-card-link svg { transform: translateX(3px); }
+
+    /* ── QUICK LINKS ─────────────────────────────────────────── */
+    .quick-links-section { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    .section-title {
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 1rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .section-title svg { width: 16px; height: 16px; }
+    .quick-row {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .quick-chip {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 1rem; border-radius: 10px;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      font-size: 0.85rem; font-weight: 500; color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .quick-chip:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface); }
+    .quick-chip svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    .docs-footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      font-size: 0.82rem; color: var(--text-muted);
+    }
+    .docs-footer a { color: var(--pink); }
+    .docs-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <img src="aimo-logo.png" alt="Aimo"/>
+      Aimo
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="commands.html">Commands</a></li>
+      <li><a href="status.html">Status</a></li>
+      <li><a href="docs.html" class="active">Docs</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+    </ul>
+    <div class="nav-btns">
+      <a href="https://discord.gg/9rSar8Kssg" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Support Server
+      </a>
+      <a href="https://discord.com/oauth2/authorize?client_id=1466757680311042060&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Invite Aimo
+      </a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="commands.html">Commands</a>
+    <a href="status.html">Status</a>
+    <a href="docs.html" class="active">Docs</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <div class="mobile-divider"></div>
+    <div class="mobile-btns">
+      <a href="https://discord.gg/9rSar8Kssg" target="_blank" rel="noopener" class="mb-outline">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Support Server
+      </a>
+      <a href="https://discord.com/oauth2/authorize?client_id=1466757680311042060&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener" class="mb-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Invite Aimo
+      </a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="docs-hero">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Documentation
+    </div>
+    <h1 class="docs-hero-title">Aimo <span>Docs</span></h1>
+    <p class="docs-hero-sub">
+      Everything you need to know about Aimo — privacy, terms, and legal information all in one place.
+    </p>
+  </section>
+
+  <!-- MAIN CARDS -->
+  <div class="docs-section">
+    <div class="docs-grid">
+
+      <!-- Privacy Policy Card -->
+      <a href="privacy.html" class="doc-card privacy">
+        <div class="doc-icon pink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="doc-card-title">Privacy Policy</div>
+          <div class="doc-card-desc">
+            Learn how Aimo collects, uses, and protects your data. We are transparent about what information the bot accesses and how it is handled.
+          </div>
+        </div>
+        <div class="doc-card-meta">
+          <span>Last updated: March 20, 2026</span>
+          <span class="doc-card-link">
+            Read Policy
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- Terms of Service Card -->
+      <a href="terms.html" class="doc-card terms">
+        <div class="doc-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div>
+          <div class="doc-card-title">Terms of Service</div>
+          <div class="doc-card-desc">
+            Read the rules and guidelines for using Aimo. By using the bot you agree to these terms — please review them carefully.
+          </div>
+        </div>
+        <div class="doc-card-meta">
+          <span>Last updated: March 20, 2026</span>
+          <span class="doc-card-link">
+            Read Terms
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- QUICK LINKS -->
+  <div class="quick-links-section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Quick Links
+    </div>
+    <div class="quick-row">
+      <a href="index.html" class="quick-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="commands.html" class="quick-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Commands List
+      </a>
+      <a href="status.html" class="quick-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Service Status
+      </a>
+      <a href="https://discord.gg/9rSar8Kssg" target="_blank" rel="noopener" class="quick-chip">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Support Server
+      </a>
+      <a href="https://discord.com/oauth2/authorize?client_id=1466757680311042060&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener" class="quick-chip">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Invite Aimo
+      </a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="docs-footer">
+    <p>&copy; 2026 Aimo Music Bot &mdash; <a href="privacy.html">Privacy Policy</a> &bull; <a href="terms.html">Terms of Service</a></p>
+  </footer>
+
+  <script>
+    const hamburger  = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    document.addEventListener('click', e => {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>

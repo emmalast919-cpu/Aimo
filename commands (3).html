@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commands — Aimo Music Bot</title>
+  <meta name="description" content="Full list of Aimo Discord music bot commands — music playback, playlists, filters, AI, and more." />
+  <link rel="icon" type="image/png" sizes="32x32" href="aimo-logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="aimo-logo.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#13111a" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .commands-hero { padding: 5rem 1.5rem 3rem; text-align: center; }
+    .commands-hero .section-label { justify-content: center; margin-bottom: 1rem; }
+    .commands-hero-title { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.15; margin: 0 0 0.75rem; }
+    .commands-hero-title span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .commands-hero-desc { color: var(--text-muted); font-size: 1.05rem; margin: 0 auto 2.5rem; max-width: 560px; }
+
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 3rem; }
+    .filter-btn {
+      padding: 0.45rem 1.1rem; border-radius: 100px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--border-strong); color: var(--text); }
+    .filter-btn.active { background: var(--gradient); border-color: transparent; color: #fff; }
+
+    .commands-page { padding: 0 1.5rem 5rem; }
+    .commands-page-inner { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
+
+    .cmd-section-header {
+      display: flex; align-items: center; gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .cmd-section-icon {
+      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+      background: var(--gradient-soft); display: flex; align-items: center; justify-content: center;
+    }
+    .cmd-section-icon svg { width: 18px; height: 18px; color: var(--pink); stroke: var(--pink); }
+    .cmd-section-name { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .cmd-section-count { font-size: 0.8rem; color: var(--text-muted); margin-top: 1px; }
+
+    .cmd-items { display: flex; flex-direction: column; gap: 0.45rem; }
+    .cmd-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 0.85rem 1.1rem;
+      transition: border-color 0.2s;
+    }
+    .cmd-item:hover { border-color: var(--border-strong); }
+    .cmd-item-name {
+      font-family: monospace; font-size: 0.88rem; font-weight: 700;
+      color: var(--pink); white-space: nowrap; min-width: 160px; flex-shrink: 0;
+      background: rgba(244,114,182,0.1); border-radius: 6px; padding: 0.15rem 0.5rem;
+    }
+    .cmd-item-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+    .cmd-premium-badge {
+      font-size: 0.72rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 100px;
+      background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3);
+      flex-shrink: 0; align-self: center; margin-left: auto;
+    }
+
+    @media (max-width: 600px) {
+      .cmd-item { flex-wrap: wrap; gap: 0.5rem; }
+      .cmd-item-name { min-width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <img src="aimo-logo.png" alt="Aimo" />
+      <span class="nav-brand-name">Aimo</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="commands.html" class="active">Commands</a></li>
+      <li><a href="status.html">Status</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="https://discord.gg/9rSar8Kssg" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Support Server
+      </a>
+      <a href="https://discord.com/oauth2/authorize?client_id=1466757680311042060&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Invite Aimo
+      </a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="commands.html">Commands</a>
+    <a href="status.html">Status</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <div class="mobile-actions">
+      <a href="https://discord.gg/9rSar8Kssg" target="_blank" rel="noopener" class="btn btn-outline">Support</a>
+      <a href="https://discord.com/oauth2/authorize?client_id=1466757680311042060&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener" class="btn btn-primary">Invite Aimo</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="commands-hero">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Commands
+    </div>
+    <h1 class="commands-hero-title">All <span>Aimo Commands</span></h1>
+    <p class="commands-hero-desc">Over 60 commands across 9 categories. Use the filter below to find what you need.</p>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" data-cat="all">All</button>
+      <button class="filter-btn" data-cat="music">Music</button>
+      <button class="filter-btn" data-cat="queue">Queue</button>
+      <button class="filter-btn" data-cat="playlist">Playlists</button>
+      <button class="filter-btn" data-cat="favorites">Favourites</button>
+      <button class="filter-btn" data-cat="filters">Filters</button>
+      <button class="filter-btn" data-cat="spotify">Spotify</button>
+      <button class="filter-btn" data-cat="ai">AI</button>
+      <button class="filter-btn" data-cat="games">Games</button>
+      <button class="filter-btn" data-cat="utility">Utility</button>
+    </div>
+  </section>
+
+  <!-- COMMANDS LIST -->
+  <section class="commands-page">
+    <div class="commands-page-inner">
+
+      <!-- Music Playback -->
+      <div class="cmd-section" data-cat="music">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Music Playback</div>
+            <div class="cmd-section-count">15 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/play</span><span class="cmd-item-desc">Play a song or playlist from YouTube, Spotify, SoundCloud, and more.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/skip</span><span class="cmd-item-desc">Skip the current song and play the next one in the queue.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pause</span><span class="cmd-item-desc">Pause the currently playing song.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/resume</span><span class="cmd-item-desc">Resume a paused song.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/stop</span><span class="cmd-item-desc">Stop playback and clear the queue.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/nowplaying</span><span class="cmd-item-desc">Show detailed info about the currently playing song.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/lyrics</span><span class="cmd-item-desc">Display real-time lyrics for the current or searched song.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/seek</span><span class="cmd-item-desc">Seek to a specific timestamp in the current song.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/rewind</span><span class="cmd-item-desc">Rewind the current song by a specified number of seconds.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/fastforward</span><span class="cmd-item-desc">Fast forward the current song by a specified number of seconds.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/replay</span><span class="cmd-item-desc">Restart the current song from the beginning.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/disconnect</span><span class="cmd-item-desc">Disconnect Aimo from the voice channel.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/247</span><span class="cmd-item-desc">Toggle 24/7 mode — keep Aimo in your voice channel around the clock.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/autoplay</span><span class="cmd-item-desc">Toggle autoplay to keep music going after the queue ends.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/loop</span><span class="cmd-item-desc">Set loop mode: off, current song, or entire queue.</span></div>
+        </div>
+      </div>
+
+      <!-- Queue Management -->
+      <div class="cmd-section" data-cat="queue">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Queue Management</div>
+            <div class="cmd-section-count">5 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/queue</span><span class="cmd-item-desc">View the current song queue with all upcoming tracks.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/shuffle</span><span class="cmd-item-desc">Shuffle the current queue randomly.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/clear</span><span class="cmd-item-desc">Clear all songs from the queue.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/remove</span><span class="cmd-item-desc">Remove a specific song from the queue by position.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/move</span><span class="cmd-item-desc">Move a song from one position to another in the queue.</span></div>
+        </div>
+      </div>
+
+      <!-- Playlists -->
+      <div class="cmd-section" data-cat="playlist">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Playlists</div>
+            <div class="cmd-section-count">11 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/pl create</span><span class="cmd-item-desc">Create a new personal playlist.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl load</span><span class="cmd-item-desc">Load and play one of your saved playlists.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl list</span><span class="cmd-item-desc">List all your saved playlists.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl delete</span><span class="cmd-item-desc">Delete one of your saved playlists.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl rename</span><span class="cmd-item-desc">Rename an existing playlist.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl share</span><span class="cmd-item-desc">Share a playlist with others using a shareable code.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl import</span><span class="cmd-item-desc">Import a playlist from a shared code or Spotify link.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl info</span><span class="cmd-item-desc">View detailed info about one of your playlists.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl track add</span><span class="cmd-item-desc">Add a song to one of your playlists.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl track remove</span><span class="cmd-item-desc">Remove a song from one of your playlists.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/pl track list</span><span class="cmd-item-desc">View all tracks in a specific playlist.</span></div>
+        </div>
+      </div>
+
+      <!-- Favourites -->
+      <div class="cmd-section" data-cat="favorites">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Favourites</div>
+            <div class="cmd-section-count">4 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/fav add</span><span class="cmd-item-desc">Add the current song to your personal favourites.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/fav list</span><span class="cmd-item-desc">View all songs in your favourites list.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/fav play</span><span class="cmd-item-desc">Play all songs from your favourites list.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/fav remove</span><span class="cmd-item-desc">Remove a song from your favourites list.</span></div>
+        </div>
+      </div>
+
+      <!-- Filters & Settings -->
+      <div class="cmd-section" data-cat="filters">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Filters &amp; Settings</div>
+            <div class="cmd-section-count">10 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/filter</span><span class="cmd-item-desc">Apply an equalizer preset to your music (flat, bass, pop, rock, etc.).</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/volume</span><span class="cmd-item-desc">Set the playback volume (0–100).</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/boost</span><span class="cmd-item-desc">Apply bass boost to enhance low frequencies. <span class="cmd-premium-badge">Premium</span></span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/speed</span><span class="cmd-item-desc">Change the playback speed of the current song. <span class="cmd-premium-badge">Premium</span></span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/reverb</span><span class="cmd-item-desc">Add reverb effect to the audio. <span class="cmd-premium-badge">Premium</span></span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/echo</span><span class="cmd-item-desc">Add an echo effect to the audio. <span class="cmd-premium-badge">Premium</span></span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/stereo</span><span class="cmd-item-desc">Enable stereo/channel mixing effect. <span class="cmd-premium-badge">Premium</span></span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/nightcore</span><span class="cmd-item-desc">Apply the nightcore effect (higher pitch and speed).</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/vaporwave</span><span class="cmd-item-desc">Apply the vaporwave effect (lower pitch and speed).</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/resetfilters</span><span class="cmd-item-desc">Remove all active audio filters and reset to default.</span></div>
+        </div>
+      </div>
+
+      <!-- Spotify -->
+      <div class="cmd-section" data-cat="spotify">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 11.5a7 7 0 0 1 8 0"/><path d="M9.5 14.5a4.5 4.5 0 0 1 5 0"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Spotify Integration</div>
+            <div class="cmd-section-count">4 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/spotify login</span><span class="cmd-item-desc">Link your Spotify account to Aimo for personalized features.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/spotify logout</span><span class="cmd-item-desc">Unlink your Spotify account from Aimo.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/spotify profile</span><span class="cmd-item-desc">View your Spotify profile stats and listening history.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/spotify playlists</span><span class="cmd-item-desc">Import and play playlists directly from your Spotify account.</span></div>
+        </div>
+      </div>
+
+      <!-- AI -->
+      <div class="cmd-section" data-cat="ai">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">AI Assistant</div>
+            <div class="cmd-section-count">3 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/ai ask</span><span class="cmd-item-desc">Ask Aimo's built-in AI anything — song recommendations, trivia, general questions.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/ai recommend</span><span class="cmd-item-desc">Get AI-powered music recommendations based on your taste.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/ai trivia</span><span class="cmd-item-desc">Start an AI-generated music trivia game in your server.</span></div>
+        </div>
+      </div>
+
+      <!-- Games -->
+      <div class="cmd-section" data-cat="games">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Games</div>
+            <div class="cmd-section-count">5 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/game snake</span><span class="cmd-item-desc">Play the classic Snake game directly inside Discord.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/game minesweeper</span><span class="cmd-item-desc">Play a game of Minesweeper to pass the time.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/game trivia</span><span class="cmd-item-desc">Start a trivia quiz with multiple difficulty levels.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/game rps</span><span class="cmd-item-desc">Challenge someone to Rock Paper Scissors.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/game tictactoe</span><span class="cmd-item-desc">Play Tic-Tac-Toe against another member.</span></div>
+        </div>
+      </div>
+
+      <!-- Utility -->
+      <div class="cmd-section" data-cat="utility">
+        <div class="cmd-section-header">
+          <div class="cmd-section-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div>
+            <div class="cmd-section-name">Utility</div>
+            <div class="cmd-section-count">5 commands</div>
+          </div>
+        </div>
+        <div class="cmd-items">
+          <div class="cmd-item"><span class="cmd-item-name">/help</span><span class="cmd-item-desc">Show the help menu with a list of all available commands.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/ping</span><span class="cmd-item-desc">Check Aimo's latency and response time.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/invite</span><span class="cmd-item-desc">Get the invite link to add Aimo to another server.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/support</span><span class="cmd-item-desc">Get a link to the official Aimo support server.</span></div>
+          <div class="cmd-item"><span class="cmd-item-name">/vote</span><span class="cmd-item-desc">Vote for Aimo on bot listing sites to support the project.</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img src="aimo-logo.png" alt="Aimo" />
+          <div class="footer-brand-name">Aimo</div>
+          <p class="footer-brand-desc">The ultimate Discord music bot — powerful, reliable, and always ready to play your favorite tunes.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="commands.html">Commands</a></li>
+            <li><a href="status.html">Status</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Links</h4>
+          <ul class="footer-links">
+            <li><a href="https://discord.com/oauth2/authorize?client_id=1466757680311042060&permissions=8&integration_type=0&scope=bot" target="_blank" rel="noopener">Invite Aimo</a></li>
+            <li><a href="https://discord.gg/9rSar8Kssg" target="_blank" rel="noopener">Support Server</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 Aimo Bot. All rights reserved.</span>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

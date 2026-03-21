@@ -1,0 +1,12 @@
+{
+  "bot": "operational",
+  "lavalink": "operational",
+  "commands": "operational",
+  "playlists": "operational",
+  "spotify": "operational",
+  "ai": "operational",
+  "website": "operational",
+  "support": "operational",
+  "maintenance": false,
+  "announcement": ""
+}
