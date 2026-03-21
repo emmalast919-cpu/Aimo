@@ -1,0 +1,13 @@
+{
+  "name": "Aimo - Discord Music Bot",
+  "short_name": "Aimo",
+  "description": "The ultimate Discord music bot — play from YouTube, Spotify, and more.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#13111a",
+  "theme_color": "#f472b6",
+  "icons": [
+    { "src": "aimo-logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "aimo-logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
