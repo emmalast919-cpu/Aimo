@@ -1,13 +1,12 @@
 {
-  "bot": "operational",
-  "lavalink": "operational",
-  "commands": "operational",
-  "playlists": "degraded",
+  "bot": "down",
+  "lavalink": "outage",
+  "commands": "degraded",
+  "playlists": "operational",
   "spotify": "operational",
-  "ai": "degraded",
+  "ai": "operational",
   "website": "operational",
-  "support": "operational",
+  "support": "degraded",
   "maintenance": false,
-  "announcement": "",
-  "apkUrl": ""
+  "announcement": "Hi"
 }
