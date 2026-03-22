@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Panel — Aimo</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="aimo-logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="aimo-logo.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#13111a" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; background: var(--bg); }
+
+    /* ── LOGIN ── */
+    .login-screen {
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 2rem;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(167,139,250,0.10) 0%, transparent 70%);
+    }
+    .login-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 24px; padding: 3rem 2.5rem; width: 100%; max-width: 400px;
+      text-align: center;
+    }
+    .login-logo { width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 1.25rem; display: block; object-fit: cover; }
+    .login-card h2 { font-size: 1.65rem; font-weight: 800; margin: 0 0 0.3rem; color: var(--text); }
+    .login-card p  { color: var(--text-muted); font-size: 0.88rem; margin: 0 0 2rem; }
+    .login-input {
+      width: 100%; padding: 0.85rem 1.1rem; border-radius: 12px;
+      background: var(--bg); border: 1.5px solid var(--border); color: var(--text);
+      font-size: 1rem; outline: none; margin-bottom: 1rem; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .login-input:focus { border-color: var(--pink); }
+    .login-btn {
+      width: 100%; padding: 0.9rem; border-radius: 12px; border: none; cursor: pointer;
+      background: var(--gradient); color: #fff; font-weight: 700; font-size: 1rem;
+      transition: opacity 0.2s; letter-spacing: 0.02em;
+    }
+    .login-btn:hover { opacity: 0.85; }
+    .login-error { margin-top: 0.75rem; color: #f87171; font-size: 0.85rem; display: none; }
+    .login-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.25);
+      color: var(--pink); border-radius: 100px; padding: 0.3rem 0.9rem;
+      font-size: 0.78rem; font-weight: 600; margin-bottom: 1.5rem;
+    }
+    .login-badge svg { width: 12px; height: 12px; }
+
+    /* ── PANEL LAYOUT ── */
+    .panel-screen { display: none; min-height: 100vh; flex-direction: column; }
+    .panel-topbar {
+      background: var(--surface); border-bottom: 1.5px solid var(--border);
+      padding: 0 2rem; height: 64px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .panel-topbar-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .panel-topbar-brand img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .panel-topbar-brand .brand-name { font-weight: 800; font-size: 1.05rem; color: var(--text); }
+    .owner-tag {
+      font-size: 0.72rem; background: var(--gradient-soft); color: var(--pink);
+      border: 1px solid rgba(244,114,182,0.25); border-radius: 100px;
+      padding: 0.2rem 0.65rem; font-weight: 600;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .topbar-clock { font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .topbar-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem; color: var(--text-muted); text-decoration: none;
+      padding: 0.45rem 0.9rem; border: 1.5px solid var(--border); border-radius: 9px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .topbar-link:hover { border-color: var(--pink); color: var(--pink); }
+    .topbar-link svg { width: 13px; height: 13px; }
+    .logout-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 0.9rem; border-radius: 9px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.8rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .logout-btn:hover { border-color: #f87171; color: #f87171; }
+    .logout-btn svg { width: 14px; height: 14px; }
+
+    .panel-body { padding: 2rem; max-width: 960px; margin: 0 auto; width: 100%; }
+
+    /* ── SECTION HEADERS ── */
+    .sec-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 2.25rem 0 1rem;
+    }
+    .sec-hdr:first-child { margin-top: 0; }
+    .sec-title {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.09em; color: var(--text-muted);
+    }
+    .sec-title svg { width: 15px; height: 15px; stroke: var(--pink); color: var(--pink); }
+    .sec-meta { font-size: 0.74rem; color: var(--text-muted); }
+
+    /* ── LIVE STATS ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0.9rem; margin-bottom: 0;
+    }
+    .stat-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 1.1rem; text-align: center;
+      transition: border-color 0.2s;
+    }
+    .stat-card-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--gradient-soft); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 0.65rem;
+    }
+    .stat-card-icon svg { width: 17px; height: 17px; stroke: var(--pink); }
+    .stat-card-val { font-size: 1.2rem; font-weight: 800; color: var(--text); line-height: 1.1; }
+    .stat-card-lbl { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .val-online  { color: #4ade80 !important; }
+    .val-offline { color: #f87171 !important; }
+    .val-warn    { color: #fbbf24 !important; }
+
+    /* ── QUICK ACTIONS ── */
+    .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .qbtn {
+      padding: 0.8rem 1rem; border-radius: 12px; border: 1.5px solid var(--border);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.82rem;
+      font-weight: 600; display: flex; align-items: center; gap: 0.55rem;
+      transition: border-color 0.2s, background 0.2s, color 0.2s; font-family: inherit;
+      text-align: left;
+    }
+    .qbtn svg { width: 16px; height: 16px; flex-shrink: 0; stroke: var(--pink); }
+    .qbtn:hover { border-color: var(--border-strong); }
+    .qbtn.q-green { }
+    .qbtn.q-green:hover { border-color: rgba(34,197,94,0.5); color: #4ade80; }
+    .qbtn.q-green:hover svg { stroke: #4ade80; }
+    .qbtn.q-red:hover { border-color: rgba(239,68,68,0.5); color: #f87171; }
+    .qbtn.q-red:hover svg { stroke: #f87171; }
+    .qbtn.q-yellow:hover { border-color: rgba(251,191,36,0.5); color: #fbbf24; }
+    .qbtn.q-yellow:hover svg { stroke: #fbbf24; }
+    .qbtn.q-blue:hover { border-color: rgba(96,165,250,0.5); color: #60a5fa; }
+    .qbtn.q-blue:hover svg { stroke: #60a5fa; }
+    .qbtn.q-purple:hover { border-color: rgba(167,139,250,0.5); color: #a78bfa; }
+    .qbtn.q-purple:hover svg { stroke: #a78bfa; }
+
+    /* ── OPTION CARDS ── */
+    .opt-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 0.6rem;
+    }
+    .opt-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .opt-label { font-weight: 600; font-size: 0.92rem; color: var(--text); }
+    .opt-sub   { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+    .opt-icon  { display: flex; align-items: center; gap: 0.6rem; }
+    .opt-icon-wrap {
+      width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+      background: var(--gradient-soft); display: flex; align-items: center; justify-content: center;
+    }
+    .opt-icon-wrap svg { width: 17px; height: 17px; stroke: var(--pink); }
+
+    .big-toggle {
+      position: relative; width: 52px; height: 28px; flex-shrink: 0; cursor: pointer;
+    }
+    .big-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .big-toggle .track {
+      position: absolute; inset: 0; border-radius: 100px;
+      background: var(--border); transition: background 0.2s;
+    }
+    .big-toggle input:checked ~ .track { background: var(--gradient); }
+    .big-toggle .thumb {
+      position: absolute; top: 4px; left: 4px; width: 20px; height: 20px;
+      background: #fff; border-radius: 50%; transition: left 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .big-toggle input:checked ~ .thumb { left: 28px; }
+
+    .text-input {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 10px; margin-top: 0.9rem;
+      background: var(--bg); border: 1.5px solid var(--border); color: var(--text);
+      font-size: 0.9rem; outline: none; resize: vertical; min-height: 70px; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .text-input:focus { border-color: var(--pink); }
+    .text-input.oneline { resize: none; min-height: unset; height: auto; }
+    .input-hint { font-size: 0.74rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+    /* ── APK SECTION ── */
+    .apk-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 1.25rem;
+    }
+    .apk-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+    .apk-info { display: flex; align-items: center; gap: 0.85rem; }
+    .apk-icon-wrap {
+      width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.08));
+      border: 1.5px solid rgba(34,197,94,0.25);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .apk-icon-wrap svg { width: 22px; height: 22px; stroke: #4ade80; }
+    .apk-title { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .apk-subtitle { font-size: 0.77rem; color: var(--text-muted); margin-top: 2px; }
+    .apk-dl-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.65rem 1.25rem; border-radius: 10px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff;
+      font-weight: 700; font-size: 0.85rem; transition: opacity 0.2s; white-space: nowrap;
+      text-decoration: none; font-family: inherit;
+    }
+    .apk-dl-btn:hover { opacity: 0.85; }
+    .apk-dl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .apk-dl-btn svg { width: 16px; height: 16px; stroke: #fff; }
+
+    /* ── SERVICE CARDS ── */
+    .svc-list { display: flex; flex-direction: column; gap: 0.55rem; }
+    .svc-card {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-left-width: 3px; border-left-color: var(--border);
+      border-radius: 14px; padding: 0.85rem 1.1rem; gap: 1rem;
+      transition: border-color 0.2s, border-left-color 0.2s;
+    }
+    .svc-card.sl-operational { border-left-color: rgba(34,197,94,0.6); }
+    .svc-card.sl-degraded    { border-left-color: rgba(251,191,36,0.6); }
+    .svc-card.sl-outage      { border-left-color: rgba(239,68,68,0.6); }
+    .svc-left { display: flex; align-items: center; gap: 0.85rem; }
+    .svc-icon {
+      width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+      background: var(--gradient-soft); display: flex; align-items: center; justify-content: center;
+    }
+    .svc-icon svg { width: 17px; height: 17px; stroke: var(--pink); color: var(--pink); }
+    .svc-icon svg[fill="currentColor"] { fill: var(--pink); stroke: none; }
+    .svc-name { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+    .svc-desc { font-size: 0.74rem; color: var(--text-muted); margin-top: 1px; }
+    .svc-right { display: flex; align-items: center; gap: 0.55rem; flex-shrink: 0; }
+
+    /* ── TOGGLE BUTTONS ── */
+    .tog-grp { display: flex; gap: 0.3rem; }
+    .tog {
+      padding: 0.36rem 0.75rem; border-radius: 8px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      font-size: 0.77rem; font-weight: 600; transition: all 0.15s; white-space: nowrap;
+      font-family: inherit;
+    }
+    .tog:hover { border-color: var(--border-strong); color: var(--text); }
+    .tog.t-op   { background: rgba(34,197,94,0.15);  border-color: rgba(34,197,94,0.4);  color: #4ade80; }
+    .tog.t-slow { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.4); color: #fbbf24; }
+    .tog.t-down { background: rgba(239,68,68,0.15);  border-color: rgba(239,68,68,0.4);  color: #f87171; }
+
+    /* ── STATUS BANNER (inside panel) ── */
+    .conn-banner {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.7rem 1rem; border-radius: 10px; margin-bottom: 1.5rem;
+      font-size: 0.82rem; font-weight: 500;
+    }
+    .conn-banner svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .conn-ok   { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #4ade80; }
+    .conn-err  { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #f87171; }
+    .conn-load { background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.2); color: var(--text-muted); }
+
+    /* ── SAVE BAR ── */
+    .save-bar {
+      position: sticky; bottom: 0; background: var(--surface);
+      border-top: 1.5px solid var(--border); padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .save-info { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+    .save-info svg { width: 13px; height: 13px; flex-shrink: 0; stroke: var(--pink); }
+    .save-right { display: flex; align-items: center; gap: 0.75rem; }
+    .save-msg { font-size: 0.85rem; font-weight: 600; }
+    .save-msg.ok  { color: #4ade80; }
+    .save-msg.err { color: #f87171; }
+    .reset-btn {
+      padding: 0.6rem 1.1rem; border-radius: 10px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.82rem;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .reset-btn:hover { border-color: var(--border-strong); color: var(--text); }
+    .save-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.65rem 1.6rem; border-radius: 10px; border: none; cursor: pointer;
+      background: var(--gradient); color: #fff; font-weight: 700; font-size: 0.88rem;
+      transition: opacity 0.2s; font-family: inherit;
+    }
+    .save-btn svg { width: 15px; height: 15px; stroke: #fff; }
+    .save-btn:hover { opacity: 0.85; }
+    .save-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 750px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .quick-grid { grid-template-columns: 1fr 1fr; }
+      .panel-body { padding: 1.25rem; }
+      .panel-topbar { padding: 0 1.25rem; }
+      .topbar-clock { display: none; }
+      .save-bar { padding: 0.9rem 1.25rem; flex-direction: column; align-items: stretch; }
+      .save-right { justify-content: flex-end; }
+    }
+    @media (max-width: 560px) {
+      .svc-card { flex-direction: column; align-items: flex-start; }
+      .svc-right { align-self: stretch; justify-content: flex-end; }
+      .quick-grid { grid-template-columns: 1fr; }
+      .tog { padding: 0.32rem 0.6rem; font-size: 0.72rem; }
+      .apk-top { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <img src="aimo-logo.png" alt="Aimo" class="login-logo" />
+    <div class="login-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Owner Access Only
+    </div>
+    <h2>Owner Panel</h2>
+    <p>Enter your password to manage Aimo's status globally.</p>
+    <input type="password" class="login-input" id="passInput" placeholder="Enter password…" autocomplete="current-password" />
+    <button class="login-btn" id="loginBtn">
+      Unlock Panel
+    </button>
+    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- ── PANEL ──────────────────────────────────────────────── -->
+<div class="panel-screen" id="panelScreen">
+
+  <!-- Top bar -->
+  <div class="panel-topbar">
+    <div class="panel-topbar-brand">
+      <img src="aimo-logo.png" alt="Aimo" />
+      <span class="brand-name">Aimo</span>
+      <span class="owner-tag">Owner Panel</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-clock" id="topClock">—</span>
+      <a href="status.html" target="_blank" class="topbar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Status Page
+      </a>
+      <button class="logout-btn" id="logoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </div>
+
+  <div class="panel-body">
+
+    <!-- Connection banner -->
+    <div class="conn-banner conn-load" id="connBanner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Loading current service states…
+    </div>
+
+    <!-- ── LIVE STATS ── -->
+    <div class="sec-hdr" style="margin-top:0;">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Lavalink Live Stats
+      </div>
+      <span class="sec-meta" id="statsAge">—</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div class="stat-card-val" id="sv-status">—</div>
+        <div class="stat-card-lbl">Server Status</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="stat-card-val" id="sv-uptime">—</div>
+        <div class="stat-card-lbl">Uptime</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="stat-card-val" id="sv-players">—</div>
+        <div class="stat-card-lbl">Active Players</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <div class="stat-card-val" id="sv-playing">—</div>
+        <div class="stat-card-lbl">Now Playing</div>
+      </div>
+    </div>
+
+    <!-- ── QUICK ACTIONS ── -->
+    <div class="sec-hdr">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Quick Actions
+      </div>
+    </div>
+    <div class="quick-grid">
+      <button class="qbtn q-green" onclick="setAll('operational')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        Set All Operational
+      </button>
+      <button class="qbtn q-yellow" onclick="setAll('degraded')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Set All Slow
+      </button>
+      <button class="qbtn q-red" onclick="setAll('outage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Set All Down
+      </button>
+      <button class="qbtn q-blue" id="refreshBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Refresh Live Stats
+      </button>
+      <button class="qbtn q-purple" onclick="window.open('status.html','_blank')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View Status Page
+      </button>
+      <button class="qbtn" onclick="clearAnnouncement()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Clear Announcement
+      </button>
+    </div>
+
+    <!-- ── MAINTENANCE & ALERTS ── -->
+    <div class="sec-hdr">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Maintenance &amp; Alerts
+      </div>
+    </div>
+
+    <div class="opt-card">
+      <div class="opt-row">
+        <div class="opt-icon">
+          <div class="opt-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div>
+            <div class="opt-label">Maintenance Mode</div>
+            <div class="opt-sub">Shows a maintenance banner on the public status page for all users.</div>
+          </div>
+        </div>
+        <label class="big-toggle">
+          <input type="checkbox" id="maintenanceToggle" />
+          <span class="track"></span>
+          <span class="thumb"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="opt-card">
+      <div class="opt-row" style="align-items:flex-start;">
+        <div class="opt-icon">
+          <div class="opt-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="opt-label">Announcement Banner</div>
+            <div class="opt-sub">Shown as a yellow alert to ALL visitors. Leave blank to hide.</div>
+          </div>
+        </div>
+      </div>
+      <textarea class="text-input" id="announcementInput" placeholder="e.g. Scheduled maintenance tonight at 22:00 UTC. Expect brief downtime." maxlength="300"></textarea>
+      <div class="input-hint" id="annCharCount">0 / 300 characters</div>
+    </div>
+
+    <!-- ── APP DOWNLOAD ── -->
+    <div class="sec-hdr">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Mobile App
+      </div>
+    </div>
+
+    <div class="apk-card">
+      <div class="apk-top">
+        <div class="apk-info">
+          <div class="apk-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 0v4m0 14v-4m-7-7H2m20 0h-3m-4.22-4.78L7.05 4.22m9.73 15.56-2.83-2.83M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <div class="apk-title">Aimo Bot — Android App</div>
+            <div class="apk-subtitle">Set the APK download URL below, then click Download.</div>
+          </div>
+        </div>
+        <a href="#" class="apk-dl-btn" id="apkDownloadBtn" onclick="doApkDownload(event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download APK
+        </a>
+      </div>
+      <input type="url" class="text-input oneline" id="apkUrlInput" placeholder="https://example.com/aimo-app.apk" />
+      <div class="input-hint">Enter the direct download URL for the APK file. Saved with other settings.</div>
+    </div>
+
+    <!-- ── SERVICE STATUS OVERRIDES ── -->
+    <div class="sec-hdr">
+      <div class="sec-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Service Status Overrides
+      </div>
+      <span class="sec-meta">Changes broadcast to ALL users instantly on Save</span>
+    </div>
+    <div class="svc-list" id="svcList"></div>
+
+  </div>
+
+  <!-- Sticky save bar -->
+  <div class="save-bar">
+    <div class="save-info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Saves update the public status page for ALL users globally.
+    </div>
+    <div class="save-right">
+      <span class="save-msg" id="saveMsg"></span>
+      <button class="reset-btn" onclick="resetAll()">Reset All</button>
+      <button class="save-btn" id="saveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save &amp; Broadcast
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SERVICES = [
+  { key: 'bot',       name: 'Discord Bot',           desc: 'Core bot connection and command processing',      icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 12.46 12.46 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.1.246.198.373.292a.077.077 0 0 1-.006.127c-.598.35-1.22.645-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>` },
+  { key: 'lavalink',  name: 'Lavalink / Music',       desc: 'Audio streaming — YouTube, Spotify, SoundCloud', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>` },
+  { key: 'commands',  name: 'Slash Commands',         desc: 'All bot slash commands and interactions',        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>` },
+  { key: 'playlists', name: 'Playlists &amp; Favourites', desc: 'Playlist creation, management, and saving', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>` },
+  { key: 'spotify',   name: 'Spotify Integration',    desc: 'Spotify login, profile, and playlist import',   icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 11.5a7 7 0 0 1 8 0"/><path d="M9.5 14.5a4.5 4.5 0 0 1 5 0"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>` },
+  { key: 'ai',        name: 'AI Assistant',           desc: 'AI chat, song recommendations, and trivia',     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/></svg>` },
+  { key: 'website',   name: 'Website',                desc: 'This website and all its pages',                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>` },
+  { key: 'support',   name: 'Support Server',         desc: 'Discord support server',                        icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.073.11 18.09.12 18.1a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 12.46 12.46 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.1.246.198.373.292a.077.077 0 0 1-.006.127c-.598.35-1.22.645-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>` }
+];
+
+const OWNER_PASS = 'Aimo@7392';
+let currentStates = {};
+let storedPassword = '';
+
+function updateClock() {
+  const el = document.getElementById('topClock');
+  if (el) el.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Login ──────────────────────────────────────────────────────
+async function doLogin() {
+  const pw = document.getElementById('passInput').value.trim();
+  if (!pw) return;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  try {
+    const r = await fetch('/api/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    if (!r.ok) {
+      errEl.style.display = 'block';
+      document.getElementById('passInput').value = '';
+      return;
+    }
+  } catch {
+    if (pw !== OWNER_PASS) {
+      errEl.style.display = 'block';
+      document.getElementById('passInput').value = '';
+      return;
+    }
+  }
+
+  storedPassword = pw;
+  document.getElementById('loginScreen').style.display = 'none';
+  const panel = document.getElementById('panelScreen');
+  panel.style.display = 'flex';
+  panel.style.flexDirection = 'column';
+  buildServiceList();
+  loadCurrentStates();
+  startLiveStats();
+}
+
+document.getElementById('passInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  storedPassword = '';
+  currentStates = {};
+  stopLiveStats();
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('panelScreen').style.display = 'none';
+  document.getElementById('passInput').value = '';
+});
+
+// ── Load states from server ────────────────────────────────────
+async function loadCurrentStates() {
+  setConnBanner('load', 'Loading current service states from server…');
+  try {
+    const r = await fetch('/api/status');
+    if (!r.ok) throw new Error('Server error');
+    const data = await r.json();
+    applyStates(data.states || {});
+    setConnBanner('ok', 'Connected — changes will broadcast to all users globally.');
+  } catch {
+    setConnBanner('err', 'Could not reach the server. Changes will be saved locally.');
+    applyStates({});
+  }
+}
+
+function setConnBanner(type, msg) {
+  const el = document.getElementById('connBanner');
+  el.className = 'conn-banner ' + (type === 'ok' ? 'conn-ok' : type === 'err' ? 'conn-err' : 'conn-load');
+  const icons = {
+    ok:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>`,
+    err:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    load: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`
+  };
+  el.innerHTML = (icons[type] || icons.load) + msg;
+}
+
+function applyStates(states) {
+  currentStates = { ...states };
+  for (const svc of SERVICES) {
+    const val = states[svc.key] || 'operational';
+    setToggle(svc.key, val);
+  }
+  const maint = document.getElementById('maintenanceToggle');
+  if (maint) maint.checked = !!states.maintenance;
+  const ann = document.getElementById('announcementInput');
+  if (ann) { ann.value = states.announcement || ''; updateCharCount(); }
+  const apkUrl = document.getElementById('apkUrlInput');
+  if (apkUrl) apkUrl.value = states.apkUrl || '';
+}
+
+// ── Live Stats SSE ─────────────────────────────────────────────
+let sseSource = null;
+let statsInterval = null;
+
+function startLiveStats() {
+  if (sseSource) sseSource.close();
+  sseSource = new EventSource('/api/events');
+  sseSource.onmessage = e => {
+    try {
+      const d = JSON.parse(e.data);
+      if (d.lavalink) renderStats(d.lavalink);
+    } catch {}
+  };
+  sseSource.onerror = () => { fetchStatsOnce(); };
+  fetchStatsOnce();
+  statsInterval = setInterval(fetchStatsOnce, 30000);
+}
+
+function stopLiveStats() {
+  if (sseSource) { sseSource.close(); sseSource = null; }
+  if (statsInterval) { clearInterval(statsInterval); statsInterval = null; }
+}
+
+async function fetchStatsOnce() {
+  try {
+    const r = await fetch('/api/lavalink-stats');
+    if (r.ok) renderStats(await r.json());
+    document.getElementById('statsAge').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch {}
+}
+
+function fmtUptime(ms) {
+  if (!ms || ms < 0) return '—';
+  const t = Math.floor(ms / 1000);
+  const d = Math.floor(t / 86400), h = Math.floor((t % 86400) / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function renderStats(lv) {
+  const online = lv.online;
+  const sv = document.getElementById('sv-status');
+  if (sv) {
+    sv.textContent = online ? 'Online' : 'Offline';
+    sv.className = 'stat-card-val ' + (online ? 'val-online' : 'val-offline');
+  }
+  const up = document.getElementById('sv-uptime');
+  if (up) up.textContent = online ? fmtUptime(lv.uptime) : '—';
+  const pl = document.getElementById('sv-players');
+  if (pl) pl.textContent = online && lv.players != null ? lv.players : '—';
+  const py = document.getElementById('sv-playing');
+  if (py) py.textContent = online && lv.playingPlayers != null ? lv.playingPlayers : '—';
+}
+
+// ── Build service list ─────────────────────────────────────────
+function buildServiceList() {
+  const list = document.getElementById('svcList');
+  if (!list) return;
+  list.innerHTML = SERVICES.map(svc => `
+    <div class="svc-card sl-operational" id="card-${svc.key}">
+      <div class="svc-left">
+        <div class="svc-icon">${svc.icon}</div>
+        <div>
+          <div class="svc-name">${svc.name}</div>
+          <div class="svc-desc">${svc.desc}</div>
+        </div>
+      </div>
+      <div class="svc-right">
+        <div class="tog-grp">
+          <button class="tog" data-key="${svc.key}" data-val="operational" onclick="handleToggle('${svc.key}','operational')">Up</button>
+          <button class="tog" data-key="${svc.key}" data-val="degraded"    onclick="handleToggle('${svc.key}','degraded')">Slow</button>
+          <button class="tog" data-key="${svc.key}" data-val="outage"      onclick="handleToggle('${svc.key}','outage')">Down</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function handleToggle(key, val) {
+  currentStates[key] = val;
+  setToggle(key, val);
+}
+
+function setToggle(key, val) {
+  const card = document.getElementById('card-' + key);
+  if (card) {
+    card.classList.remove('sl-operational', 'sl-degraded', 'sl-outage');
+    card.classList.add('sl-' + (val || 'operational'));
+  }
+  document.querySelectorAll(`[data-key="${key}"]`).forEach(btn => {
+    btn.classList.remove('t-op', 't-slow', 't-down');
+    if (btn.dataset.val === val) {
+      if (val === 'operational') btn.classList.add('t-op');
+      if (val === 'degraded')    btn.classList.add('t-slow');
+      if (val === 'outage')      btn.classList.add('t-down');
+    }
+  });
+}
+
+function setAll(val) {
+  for (const svc of SERVICES) handleToggle(svc.key, val);
+}
+
+function resetAll() {
+  for (const svc of SERVICES) handleToggle(svc.key, 'operational');
+  const m = document.getElementById('maintenanceToggle');
+  if (m) m.checked = false;
+  const a = document.getElementById('announcementInput');
+  if (a) { a.value = ''; updateCharCount(); }
+}
+
+function clearAnnouncement() {
+  const a = document.getElementById('announcementInput');
+  if (a) { a.value = ''; updateCharCount(); }
+}
+
+function updateCharCount() {
+  const ann = document.getElementById('announcementInput');
+  const hint = document.getElementById('annCharCount');
+  if (ann && hint) hint.textContent = `${ann.value.length} / 300 characters`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const ann = document.getElementById('announcementInput');
+  if (ann) ann.addEventListener('input', updateCharCount);
+});
+
+// ── APK Download ───────────────────────────────────────────────
+function doApkDownload(e) {
+  e.preventDefault();
+  const url = (document.getElementById('apkUrlInput').value || '').trim();
+  if (!url) {
+    showSaveMsg('No APK URL set — enter a URL below first.', false);
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'aimo-app.apk';
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ── Refresh stats button ───────────────────────────────────────
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = 'Refreshing…';
+  await fetchStatsOnce();
+  btn.disabled = false;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Refresh Live Stats`;
+});
+
+// ── Save ───────────────────────────────────────────────────────
+function showSaveMsg(msg, ok) {
+  const el = document.getElementById('saveMsg');
+  el.textContent = msg;
+  el.className = 'save-msg ' + (ok ? 'ok' : 'err');
+  setTimeout(() => { el.textContent = ''; el.className = 'save-msg'; }, 4000);
+}
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Saving…`;
+
+  const states = {};
+  for (const svc of SERVICES) states[svc.key] = currentStates[svc.key] || 'operational';
+  states.maintenance  = document.getElementById('maintenanceToggle').checked;
+  states.announcement = (document.getElementById('announcementInput').value || '').trim();
+  states.apkUrl       = (document.getElementById('apkUrlInput').value || '').trim();
+
+  try {
+    const r = await fetch('/api/service-states', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: storedPassword, states })
+    });
+    if (r.ok) {
+      const data = await r.json();
+      applyStates(data.states || states);
+      showSaveMsg('Saved & broadcast to all users!', true);
+      setConnBanner('ok', 'Connected — last saved at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    } else {
+      const err = await r.json().catch(() => ({}));
+      showSaveMsg(err.error || 'Save failed.', false);
+    }
+  } catch {
+    showSaveMsg('Network error — server unreachable.', false);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save &amp; Broadcast`;
+});
+</script>
+</body>
+</html>
